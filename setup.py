@@ -30,8 +30,8 @@ setup(
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     ],
     keywords="Python Plone CMS",
-    author="Peter Holzer",
-    author_email="peter.holzer@agitator.com",
+    author="BlueDynamics Alliance",
+    author_email="dev@bluedynamics.com",
     url="https://github.com/collective/bda.plone.wallee",
     project_urls={
         "PyPI": "https://pypi.python.org/pypi/bda.plone.wallee",

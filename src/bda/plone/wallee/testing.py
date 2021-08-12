@@ -21,11 +21,12 @@ class BdaPloneWalleeLayer(PloneSandboxLayer):
         # The z3c.autoinclude feature is disabled in the Plone fixture base
         # layer.
         import plone.restapi
+
         self.loadZCML(package=plone.restapi)
         self.loadZCML(package=bda.plone.wallee)
 
     def setUpPloneSite(self, portal):
-        applyProfile(portal, 'bda.plone.wallee:default')
+        applyProfile(portal, "bda.plone.wallee:default")
 
 
 BDA_PLONE_WALLEE_FIXTURE = BdaPloneWalleeLayer()
@@ -33,13 +34,13 @@ BDA_PLONE_WALLEE_FIXTURE = BdaPloneWalleeLayer()
 
 BDA_PLONE_WALLEE_INTEGRATION_TESTING = IntegrationTesting(
     bases=(BDA_PLONE_WALLEE_FIXTURE,),
-    name='BdaPloneWalleeLayer:IntegrationTesting',
+    name="BdaPloneWalleeLayer:IntegrationTesting",
 )
 
 
 BDA_PLONE_WALLEE_FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(BDA_PLONE_WALLEE_FIXTURE,),
-    name='BdaPloneWalleeLayer:FunctionalTesting',
+    name="BdaPloneWalleeLayer:FunctionalTesting",
 )
 
 
@@ -49,5 +50,5 @@ BDA_PLONE_WALLEE_ACCEPTANCE_TESTING = FunctionalTesting(
         REMOTE_LIBRARY_BUNDLE_FIXTURE,
         z2.ZSERVER_FIXTURE,
     ),
-    name='BdaPloneWalleeLayer:AcceptanceTesting',
+    name="BdaPloneWalleeLayer:AcceptanceTesting",
 )

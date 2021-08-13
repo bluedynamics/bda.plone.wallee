@@ -4,7 +4,7 @@ from zope import schema
 from zope.i18nmessageid import MessageFactory
 from zope.interface import provider
 
-from bda.plone.wallee import _
+_ = MessageFactory("bda.plone.wallee")
 
 
 @provider(IShopSettingsProvider)
@@ -16,8 +16,9 @@ class IWalleeSettings(model.Schema):
         'wallee',
         label=_(u'Wallee', default=u'Wallee'),
         fields=[
-            'secret_key',
-            'publishable_key'
+            'space_id',
+            'user_id',
+            'api_secret',
         ],
     )
 

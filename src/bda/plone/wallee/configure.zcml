@@ -13,6 +13,9 @@
   -->
   <!--<includeDependencies package="." />-->
 
+  <!-- Payment -->
+  <adapter name="wallee_payment" factory=".WalleePayment" />
+
   <genericsetup:registerProfile
       name="default"
       title="bda.plone.wallee"

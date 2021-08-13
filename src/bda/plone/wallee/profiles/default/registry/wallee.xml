@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<registry
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    i18n:domain="bda.plone.wallee">
+
+  <records interface="bda.plone.wallee.interfaces.IWalleeSettings">
+    <value key="space_id" purge="false">space_id</value>
+    <value key="user_id" purge="false">user_id</value>
+    <value key="api_secret" purge="false">api_secret</value>
+  </records>
+
+</registry>

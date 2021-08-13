@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Setup tests for this package."""
 import unittest
 
@@ -30,14 +29,6 @@ class TestSetup(unittest.TestCase):
         """Test if bda.plone.wallee is installed."""
         self.assertTrue(self.installer.isProductInstalled("bda.plone.wallee"))
 
-    def test_browserlayer(self):
-        """Test that IBdaPloneWalleeLayer is registered."""
-        from plone.browserlayer import utils
-
-        from bda.plone.wallee.interfaces import IBdaPloneWalleeLayer
-
-        self.assertIn(IBdaPloneWalleeLayer, utils.registered_layers())
-
 
 class TestUninstall(unittest.TestCase):
 
@@ -57,11 +48,3 @@ class TestUninstall(unittest.TestCase):
     def test_product_uninstalled(self):
         """Test if bda.plone.wallee is cleanly uninstalled."""
         self.assertFalse(self.installer.isProductInstalled("bda.plone.wallee"))
-
-    def test_browserlayer_removed(self):
-        """Test that IBdaPloneWalleeLayer is removed."""
-        from plone.browserlayer import utils
-
-        from bda.plone.wallee.interfaces import IBdaPloneWalleeLayer
-
-        self.assertNotIn(IBdaPloneWalleeLayer, utils.registered_layers())

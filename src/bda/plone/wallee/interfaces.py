@@ -9,33 +9,26 @@ _ = MessageFactory("bda.plone.wallee")
 
 @provider(IShopSettingsProvider)
 class IWalleeSettings(model.Schema):
-    """Wallee controlpanel schema.
-    """
+    """Wallee controlpanel schema."""
 
     model.fieldset(
-        'wallee',
-        label=_(u'Wallee', default=u'Wallee'),
+        "wallee",
+        label=_("Wallee", default="Wallee"),
         fields=[
-            'space_id',
-            'user_id',
-            'api_secret',
+            "space_id",
+            "user_id",
+            "api_secret",
         ],
     )
 
     space_id = schema.ASCIILine(
-        title=_(u"label_secret_key", default=u'Space ID'),
-        required=True,
-        default=""
+        title=_("label_secret_key", default="Space ID"), required=True, default=""
     )
 
     user_id = schema.ASCIILine(
-        title=_(u"label_user_id", default=u'User ID'),
-        required=True,
-        default=""
+        title=_("label_user_id", default="User ID"), required=True, default=""
     )
 
     api_secret = schema.ASCIILine(
-        title=_(u"label_api_secret", default=u'API Secret'),
-        required=True,
-        default=""
+        title=_("label_api_secret", default="API Secret"), required=True, default=""
     )

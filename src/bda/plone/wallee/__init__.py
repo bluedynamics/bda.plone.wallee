@@ -1,16 +1,15 @@
-# -*- coding: utf-8 -*-
-"""Init and utils."""
-from zope.i18nmessageid import MessageFactory
-from Products.Five import BrowserView
+import logging
+
 from bda.plone.cart.cartitem import purge_cart
-from bda.plone.payment import Payment
-from bda.plone.payment import Payments
+from bda.plone.payment import Payment, Payments
 from bda.plone.payment.interfaces import IPaymentData
 from bda.plone.shop.utils import get_shop_settings
 from plone.registry.interfaces import IRegistry
+from Products.Five import BrowserView
 from zope.component import getUtility
+from zope.i18nmessageid import MessageFactory
+
 from bda.plone.wallee import interfaces
-import logging
 
 _ = MessageFactory("bda.plone.wallee")
 
@@ -20,13 +19,12 @@ def get_wallee_settings():
 
 
 class WalleePayment(Payment):
-    pid = 'wallee_payment'
-    label = _('wallee_payment', 'Wallee Payment')
+    pid = "wallee_payment"
+    label = _("wallee_payment", "Wallee Payment")
     clear_session = False
 
 
-class WalleeSettings(object):
-
+class WalleeSettings:
     @property
     def space_id(self):
         return get_wallee_settings().space_id

@@ -98,7 +98,7 @@ def wallee_checkout_lightbox(view):
 
     breakpoint()
 
-def wallee_lightbox_renderer():
+def wallee_lightbox_renderer(widget, data):
     return """
         <script src="{ JavaScript URL }" type="text/javascript"></script>
         <script type="text/javascript">
@@ -126,8 +126,8 @@ def wallee_checkout_button(view):
         },
         custom={
             "wallee_lightbox": {
-                "edit_renderers": wallee_lightbox_renderer(),
-                "display_renderers": wallee_lightbox_renderer()
+                "edit_renderers": [wallee_lightbox_renderer],
+                "display_renderers": [wallee_lightbox_renderer],
             }
         }
     )

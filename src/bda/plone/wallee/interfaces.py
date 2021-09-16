@@ -4,6 +4,7 @@ from zope import schema
 from zope.i18nmessageid import MessageFactory
 from zope.interface import provider
 
+
 _ = MessageFactory("bda.plone.wallee")
 
 

@@ -1,11 +1,10 @@
-import os
-import unittest
-
-import robotsuite
+from bda.plone.wallee.testing import BDA_PLONE_WALLEE_ACCEPTANCE_TESTING  # noqa: E501
 from plone.app.testing import ROBOT_TEST_LEVEL
 from plone.testing import layered
 
-from bda.plone.wallee.testing import BDA_PLONE_WALLEE_ACCEPTANCE_TESTING  # noqa: E501
+import os
+import robotsuite
+import unittest
 
 
 def test_suite():

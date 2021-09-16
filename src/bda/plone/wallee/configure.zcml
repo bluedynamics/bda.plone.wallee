@@ -2,6 +2,7 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:plone="http://namespaces.plone.org/plone"
     i18n_domain="bda.plone.wallee">
 
@@ -15,6 +16,21 @@
 
   <!-- Payment -->
   <adapter name="wallee_payment" factory=".WalleePayment" />
+
+  <browser:page
+    for="*"
+    name="wallee_payment_success"
+    class="bda.plone.wallee.TransactionView"
+    template="success.pt"
+    permission="zope2.View" />
+
+  <browser:page
+    for="*"
+    name="wallee_payment_failed"
+    class="bda.plone.wallee.TransactionView"
+    template="failed.pt"
+    permission="zope2.View" />
+
 
   <genericsetup:registerProfile
       name="default"

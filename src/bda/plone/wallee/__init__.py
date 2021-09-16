@@ -48,18 +48,19 @@ class WalleePayment(Payment):
     clear_session = False
 
 
-# class WalleeSettings:
-#     @property
-#     def space_id(self):
-#         return get_wallee_settings().space_id
+class WalleeSettings:
 
-#     @property
-#     def user_id(self):
-#         return get_wallee_settings().user_id
+    @property
+    def space_id(self):
+        return get_wallee_settings().space_id
 
-#     @property
-#     def api_secret(self):
-#         return get_wallee_settings().api_secret
+    @property
+    def user_id(self):
+        return get_wallee_settings().user_id
+
+    @property
+    def api_secret(self):
+        return get_wallee_settings().api_secret
 
 
 def wallee_checkout_lightbox(view, data):
@@ -88,6 +89,8 @@ def wallee_checkout_lightbox(view, data):
     cart_data = get_data_provider(view.context, view.request)
 
     form_data = view.request.form
+    # get untime form data
+    # view.form.extract(view.request)
 
     billing_address = {
         "gender": form_data.get("checkout.personal_data.gender", "").upper(),
@@ -102,6 +105,10 @@ def wallee_checkout_lightbox(view, data):
         "country": form_data.get("checkout.billing_address.country", ""),
     }
 
+    # breakpoint()
+
+    # todo alternative delivery address
+    # fdata["delivery_address"]["alternative_delivery"].value
     # shippingAddress = {
     #     "gender": "",
     #     "givenName": "Sam",
@@ -209,22 +216,49 @@ def wallee_checkout_lightbox(view, data):
         )
 
     # breakpoint()
-    # create transaction model
+
+    # create minimal transaction model
     transaction = TransactionCreate(
         language=api.portal.get_current_language(),
-        success_url=f"{base}/@@wallee_payment_success",
-        failed_url=f"{base}/@@wallee_payment_failed",
+        currency=cart_data.currency,
+    )
+
+    # breakpoint()
+    transaction_create = transaction_service.create(
+        space_id=space_id, transaction=transaction
+    )
+
+
+    transaction_id = transaction_create.id
+
+
+    # create transaction model
+    transaction = TransactionCreate(
+        id=transaction_id,
+        language=api.portal.get_current_language(),
+        success_url=f"{base}/@@wallee_payment_success/?transaction_id={transaction_id}",
+        failed_url=f"{base}/@@wallee_payment_failed/?transaction_id={transaction_id}",
         line_items=line_items,
         auto_confirmation_enabled=True,
         currency=cart_data.currency,
         billing_address=billing_address,
     )
 
-    breakpoint()
+    transaction_service.update(space_id=space_id, entity=transaction_create)
+
     # try / except / catch error
     transaction_create = transaction_service.create(
         space_id=space_id, transaction=transaction
     )
+
+    # transaction_id = transaction_create.id
+    # transaction_service.read(space_id=space_id, id=transaction_id)
+    # transaction.success_url = f"{transaction.success_url}/transaction_id={transaction_id}"
+    # transaction.failed_url = f"{transaction.failed_url}/transaction_id={transaction_id}"
+
+    print(transaction)
+
+    # breakpoint()
 
     return transaction_lightbox_service_api.javascript_url(
         space_id, transaction_create.id
@@ -284,8 +318,28 @@ def wallee_checkout_button(view):
         },
     )
 
-    view.form["wallee_lightbox_script"] = lightbox_script
-    view.form["wallee_checkout_button"] = checkout_button
+    view.form["form-controls"]["wallee_lightbox_script"] = lightbox_script
+    view.form["form-controls"]["wallee_checkout_button"] = checkout_button
 
 
 confirmation_button_factories.append(wallee_checkout_button)
+
+
+class TransactionView(BrowserView, WalleeSettings):
+    """Handling of Wallee Transaction Respone"""
+
+    @property
+    def message(self):
+        if "transaction_id" in self.request:
+            transaction_id = self.request.get("transaction_id")
+
+            config = Configuration(
+                user_id=self.user_id,
+                api_secret=self.api_secret
+            )
+            transaction_service = TransactionServiceApi(configuration=config)
+            transaction = transaction_service.read(space_id=self.space_id, id=transaction_id)
+
+        print(transaction)
+        breakpoint()
+        return transaction

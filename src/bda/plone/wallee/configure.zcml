@@ -27,7 +27,7 @@
   <browser:page
     for="*"
     name="wallee_payment_success"
-    class="bda.plone.wallee.TransactionView"
+    class="bda.plone.wallee.TransactionSuccessView"
     template="success.pt"
     permission="zope2.View" />
 

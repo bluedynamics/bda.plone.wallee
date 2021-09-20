@@ -53,17 +53,6 @@ SKIP_RENDER_CART_PATTERNS.append('@@wallee_payment_success')
 def get_wallee_settings():
     return getUtility(IRegistry).forInterface(interfaces.IWalleeSettings)
 
-
-class WalleePaymentLightbox(Payment):
-    pid = "wallee_payment_lightbox"
-    label = _("wallee_payment", "Wallee Payment Lightbox")
-    clear_session = False
-
-
-    def init_url(self, uid):
-        return addTokenToUrl('%s/@@wallee_payment?uid=%s' % (self.context.absolute_url(), uid))
-
-
 class WalleeSettings:
 
     @property
@@ -77,6 +66,16 @@ class WalleeSettings:
     @property
     def api_secret(self):
         return get_wallee_settings().api_secret
+
+
+class WalleePaymentLightbox(Payment):
+    pid = "wallee_payment_lightbox"
+    label = _("wallee_payment", "Wallee Payment Lightbox")
+    clear_session = False
+
+
+    def init_url(self, uid):
+        return addTokenToUrl('%s/@@wallee_payment?uid=%s' % (self.context.absolute_url(), uid))
 
 
 class WalleePaymentLightboxView(BrowserView, WalleeSettings):
@@ -263,7 +262,7 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
         # transaction.failed_url = f"{transaction.failed_url}/transaction_id={transaction_id}"
 
         print(transaction)
-        order.tid = transaction_id
+        order.tid = str(transaction_id)
         # breakpoint()
 
         return transaction_lightbox_service_api.javascript_url(
@@ -287,5 +286,21 @@ class TransactionView(BrowserView, WalleeSettings):
             transaction = transaction_service.read(space_id=self.space_id, id=transaction_id)
 
         print(transaction)
-        breakpoint()
         return transaction
+
+    def status(self):
+        return ""
+
+
+class TransactionSuccessView(TransactionView):
+    """On Success empty cart & mark order as salaried"""
+
+    def __call__(self):
+        if "order_uid" in self.request and "transaction_id" in self.request:
+            transaction_id = self.request.get("transaction_id")
+            order_uid = self.request.get("order_uid")
+
+            order = OrderData(self.context, order_uid)
+
+            if order.tid == transaction_id:
+                order.salaried = "yes" 

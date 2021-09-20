@@ -298,7 +298,7 @@ class TransactionView(BrowserView, WalleeSettings):
 class TransactionSuccessView(TransactionView):
     """On Success empty cart & mark order as salaried"""
 
-    def __call__(self):
+    def status_update(self):
         # breakpoint()
         if "order_uid" in self.request and "transaction_id" in self.request:
             transaction_id = self.request.get("transaction_id")
@@ -308,3 +308,4 @@ class TransactionSuccessView(TransactionView):
             order_tid = order.tid.pop()
             if order_tid == transaction_id:
                 order.salaried = "yes" 
+            return order.salaried

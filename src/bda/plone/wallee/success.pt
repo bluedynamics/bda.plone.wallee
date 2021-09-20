@@ -22,6 +22,9 @@
         i18n:translate="wallee_payment_success">Payment Success</h1>
     </header>
 
+    <p>
+      Zahlung erfolgt: <span tal:content="view/status_update"></span>
+    </p>
     <p tal:content="structure view/message">
       Success Message
     </p>

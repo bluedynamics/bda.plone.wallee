@@ -15,7 +15,14 @@
   <!--<includeDependencies package="." />-->
 
   <!-- Payment -->
-  <adapter name="wallee_payment" factory=".WalleePayment" />
+  <adapter name="wallee_payment_lightbox" factory=".WalleePaymentLightbox" />
+
+  <browser:page
+    for="*"
+    name="wallee_payment"
+    class="bda.plone.wallee.WalleePaymentLightboxView"
+    template="payment_lightbox.pt"
+    permission="zope2.View" />
 
   <browser:page
     for="*"

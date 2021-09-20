@@ -16,7 +16,7 @@ long_description = "\n\n".join(
 
 setup(
     name="bda.plone.wallee",
-    version="1.0a1",
+    version="1.1a1",
     description="Wallee payment integration for bda.plone.shop",
     long_description=long_description,
     # Get more from https://pypi.org/classifiers/

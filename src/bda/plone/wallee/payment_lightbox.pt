@@ -19,17 +19,30 @@
 
     <header>
       <h1 class="documentFirstHeading"
-        i18n:translate="wallee_payment_success">Payment Success</h1>
+        i18n:translate="wallee_payment_title">wallee Payment</h1>
     </header>
 
-    <p tal:content="structure view/message">
+
+    <script src='${view/lightbox_script_url}' type='text/javascript'></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+          window.LightboxCheckoutHandler.startPayment(undefined, function(){
+                  alert('An error occurred during the initialization of the payment lightbox.');
+          });
+        });
+    </script>
+
+
+
+    <!-- <p tal:content="structure view/message">
       Success Message
-    </p>
+    </p> -->
 
 
-    <p i18n:translate="wallee_payment_success_text">
+    <!-- <p i18n:translate="wallee_payment_success_text">
       Your Order has been completed successful.
-    </p>
+    </p> -->
 
 
   </tal:main-macro>

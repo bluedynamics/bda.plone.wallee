@@ -243,62 +243,81 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
         transaction_lightbox_service_api = TransactionLightboxServiceApi(
             configuration=config
         )
-
-        # create minimal transaction model
-        transaction = TransactionCreate(
-            language=api.portal.get_current_language(),
-            currency=order.currency,
-        )
-
         # breakpoint()
-        transaction_create = transaction_service.create(
-            space_id=space_id, transaction=transaction
-        )
-
-        transaction_id = transaction_create.id
 
         # create transaction model
         transaction = TransactionCreate(
-            id=transaction_id,
-            merchant_reference=str(order.uid),
             language=api.portal.get_current_language(),
-            success_url=addTokenToUrl(
-                f"{base}/@@wallee_payment_success/?order_uid={str(order.uid)}&transaction_id={transaction_id}"
-            ),
-            failed_url=addTokenToUrl(
-                f"{base}/@@wallee_payment_failed/?order_uid={str(order.uid)}&transaction_id={transaction_id}"
-            ),
-            line_items=line_items,
-            # auto_confirmation_enabled=True,
-            charge_retry_enabled=False,
             currency=order.currency,
+            line_items=line_items,
             billing_address=billing_address,
             shipping_address=shipping_address,
+            merchant_reference=order_data["ordernumber"],
         )
 
-        transaction_service.update(space_id=space_id, entity=transaction_create)
-
-        # try / except / catch error
-        transaction_create = transaction_service.create(
+        transaction = transaction_service.create(
             space_id=space_id, transaction=transaction
         )
 
+        # transaction = TransactionCreate(
+        #     id=transaction.id,
+        #     version=transaction.version,
+        #     success_url=addTokenToUrl(
+        #         f"{base}/@@wallee_payment_success/?order_uid={str(order.uid)}&transaction_id={transaction.id}"
+        #     ),
+        #     failed_url=addTokenToUrl(
+        #         f"{base}/@@wallee_payment_failed/?order_uid={str(order.uid)}&transaction_id={transaction.id}"
+        #     ),
+        # )
+
+        transaction.success_url = addTokenToUrl(
+            f"{base}/@@wallee_payment_success/?order_uid={str(order.uid)}&transaction_id={transaction.id}"
+        )
+
+        transaction.failed_url = addTokenToUrl(
+            f"{base}/@@wallee_payment_failed/?order_uid={str(order.uid)}&transaction_id={transaction.id}"
+        )
+
+        transaction_service.update(
+            space_id=space_id,
+            entity=transaction,
+        )
+        # breakpoint()
+        # try / except / catch error
+        # transaction_create = transaction_service.create(
+        #     space_id=space_id, transaction=transaction
+        # )
+
         # transaction_id = transaction_create.id
-        # transaction_service.read(space_id=space_id, id=transaction_id)
+        # transaction_service.read(space_id=space_id, id=transaction.id)
         # transaction.success_url = f"{transaction.success_url}/transaction_id={transaction_id}"
         # transaction.failed_url = f"{transaction.failed_url}/transaction_id={transaction_id}"
 
-        print(transaction)
-        order.tid = str(transaction_id)
+        # print(transaction)
+        order.tid = str(transaction.id)
         # breakpoint()
 
-        return transaction_lightbox_service_api.javascript_url(
-            space_id, transaction_create.id
-        )
+        return transaction_lightbox_service_api.javascript_url(space_id, transaction.id)
 
 
 class TransactionView(BrowserView, WalleeSettings):
     """Handling of Wallee Transaction Respone"""
+
+
+
+    @property
+    def transaction(self):
+        if "transaction_id" in self.request:
+            transaction_id = self.request.get("transaction_id")
+
+            config = Configuration(user_id=self.user_id, api_secret=self.api_secret)
+            transaction_service = TransactionServiceApi(configuration=config)
+            transaction = transaction_service.read(
+                space_id=self.space_id, id=transaction_id
+            )
+            import pprint
+            pprint.pprint(transaction)
+            return transaction
 
     @property
     def message(self):
@@ -312,6 +331,7 @@ class TransactionView(BrowserView, WalleeSettings):
             )
 
         print(transaction)
+        breakpoint()
         return transaction
 
     def status(self):
@@ -326,7 +346,7 @@ class TransactionSuccessView(TransactionView):
         if "order_uid" in self.request and "transaction_id" in self.request:
             transaction_id = self.request.get("transaction_id")
             order_uid = self.request.get("order_uid")
-
+            breakpoint()
             order = OrderData(self.context, order_uid)
             order_tid = order.tid.pop()
             if order_tid == transaction_id:

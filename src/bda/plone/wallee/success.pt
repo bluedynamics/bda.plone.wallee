@@ -6,12 +6,6 @@
       metal:use-macro="here/main_template/macros/master"
       i18n:domain="bda.plone.wallee">
 
-<head>
-  <metal:top fill-slot="top_slot">
-    <tal:border define="dummy python:request.set('disable_border', True)" />
-  </metal:top>
-</head>
-
 <body>
 
 <metal:main fill-slot="main">
@@ -22,17 +16,22 @@
         i18n:translate="wallee_payment_success">Payment Success</h1>
     </header>
 
-    <p>
-      Zahlung erfolgt: <span tal:content="view/status_update"></span>
-    </p>
+    <div tal:attributes="data-order-salaried view/status_update">
+    </div>
+
     <p tal:content="structure view/message">
       Success Message
     </p>
 
-
     <p i18n:translate="wallee_payment_success_text">
       Your Order has been completed successful.
     </p>
+
+    <a href=""
+       class="btn btn-primary"
+       tal:attributes="href context/absolute_url"
+       i18n:translate="payment_done_continue">continue</a>
+
 
 
   </tal:main-macro>

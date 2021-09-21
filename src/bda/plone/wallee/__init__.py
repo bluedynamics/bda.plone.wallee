@@ -42,19 +42,19 @@ from zope.event import notify
 import transaction
 import logging
 
-
+logger = logging.getLogger(__name__)
 _ = MessageFactory("bda.plone.wallee")
 
-SKIP_RENDER_CART_PATTERNS.append('@@wallee_payment')
-SKIP_RENDER_CART_PATTERNS.append('@@wallee_payment_success')
+SKIP_RENDER_CART_PATTERNS.append("@@wallee_payment")
+SKIP_RENDER_CART_PATTERNS.append("@@wallee_payment_success")
 # SKIP_RENDER_CART_PATTERNS.append('@@wallee_payment_failed')
 
 
 def get_wallee_settings():
     return getUtility(IRegistry).forInterface(interfaces.IWalleeSettings)
 
-class WalleeSettings:
 
+class WalleeSettings:
     @property
     def space_id(self):
         return get_wallee_settings().space_id
@@ -68,23 +68,42 @@ class WalleeSettings:
         return get_wallee_settings().api_secret
 
 
-
 class WalleePaymentLightbox(Payment):
     pid = "wallee_payment_lightbox"
     label = _("wallee_payment", "Wallee Payment Lightbox")
     clear_session = False
 
-
     def init_url(self, uid):
-        return addTokenToUrl('%s/@@wallee_payment?uid=%s' % (self.context.absolute_url(), uid))
-
+        return addTokenToUrl(
+            "%s/@@wallee_payment?uid=%s" % (self.context.absolute_url(), uid)
+        )
 
 
 class WalleePaymentLightboxView(BrowserView, WalleeSettings):
 
+    @property
+    def shop_admin_mail(self):
+        # This is a soft dependency indirection on bda.plone.shop
+        entry = "bda.plone.shop.interfaces.IShopSettings.admin_email"
+        shop_email = api.portal.get_registry_record(name=entry, default=None)
+        if shop_email is not None:
+            return shop_email
+        logger.warning("No shop master email was set.")
+        return "(no shopmaster email set)"
+
+    @property
+    def shop_admin_name(self):
+        # This is a soft dependency indirection on bda.plone.shop
+        entry = "bda.plone.shop.interfaces.IShopSettings.admin_name"
+        shop_name = api.portal.get_registry_record(name=entry, default=None)
+        if shop_name is not None:
+            return shop_name
+        logger.warning("No shop master name was set.")
+        return "(no shopmaster name set)"
+
     def lightbox_script_url(self):
         # breakpoint()
-        
+
         order = OrderData(self.context, uid=self.request.get("uid"))
         order_data = order.order.attrs
 
@@ -117,7 +136,6 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
         else:
             shipping_address = billing_address
 
-
         # create line items
         line_items = []
         # breakpoint()
@@ -138,11 +156,15 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             #     quantity = float(booking.get("cart_item_count"))
 
             # amountIncludingTax = booking_data.get("cart_item_price", ""))
-            amountIncludingTax = booking_data["net"] + (booking_data["net"] / 100 * booking_data["vat"])
+            amountIncludingTax = booking_data["net"] + (
+                booking_data["net"] / 100 * booking_data["vat"]
+            )
 
             if booking_data.get("cart_item_discount", ""):
                 discounted_net = booking_data["net"] - booking_data["discount_net"]
-                amountIncludingTax = discounted_net + (discounted_net / 100 * booking_data["vat"])
+                amountIncludingTax = discounted_net + (
+                    discounted_net / 100 * booking_data["vat"]
+                )
 
             line_items.append(
                 LineItem(
@@ -233,17 +255,19 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             space_id=space_id, transaction=transaction
         )
 
-
         transaction_id = transaction_create.id
-
 
         # create transaction model
         transaction = TransactionCreate(
             id=transaction_id,
             merchant_reference=str(order.uid),
             language=api.portal.get_current_language(),
-            success_url=addTokenToUrl(f"{base}/@@wallee_payment_success/?order_uid={str(order.uid)}&transaction_id={transaction_id}"),
-            failed_url=addTokenToUrl(f"{base}/@@wallee_payment_failed/?order_uid={str(order.uid)}&transaction_id={transaction_id}"),
+            success_url=addTokenToUrl(
+                f"{base}/@@wallee_payment_success/?order_uid={str(order.uid)}&transaction_id={transaction_id}"
+            ),
+            failed_url=addTokenToUrl(
+                f"{base}/@@wallee_payment_failed/?order_uid={str(order.uid)}&transaction_id={transaction_id}"
+            ),
             line_items=line_items,
             # auto_confirmation_enabled=True,
             charge_retry_enabled=False,
@@ -281,12 +305,11 @@ class TransactionView(BrowserView, WalleeSettings):
         if "transaction_id" in self.request:
             transaction_id = self.request.get("transaction_id")
 
-            config = Configuration(
-                user_id=self.user_id,
-                api_secret=self.api_secret
-            )
+            config = Configuration(user_id=self.user_id, api_secret=self.api_secret)
             transaction_service = TransactionServiceApi(configuration=config)
-            transaction = transaction_service.read(space_id=self.space_id, id=transaction_id)
+            transaction = transaction_service.read(
+                space_id=self.space_id, id=transaction_id
+            )
 
         print(transaction)
         return transaction
@@ -307,5 +330,5 @@ class TransactionSuccessView(TransactionView):
             order = OrderData(self.context, order_uid)
             order_tid = order.tid.pop()
             if order_tid == transaction_id:
-                order.salaried = "yes" 
+                order.salaried = "yes"
             return order.salaried

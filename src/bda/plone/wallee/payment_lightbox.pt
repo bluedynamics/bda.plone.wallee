@@ -6,12 +6,6 @@
       metal:use-macro="here/main_template/macros/master"
       i18n:domain="bda.plone.wallee">
 
-<head>
-  <metal:top fill-slot="top_slot">
-    <tal:border define="dummy python:request.set('disable_border', True)" />
-  </metal:top>
-</head>
-
 <body>
 
 <metal:main fill-slot="main">
@@ -19,31 +13,31 @@
 
     <header>
       <h1 class="documentFirstHeading"
-        i18n:translate="wallee_payment_title">wallee Payment</h1>
+        i18n:translate="wallee_payment_title">Payment</h1>
     </header>
 
+    <div class="spinner-box w-auto d-flex justify-content-center align-items-center">
+      <div class="spinner-border text-secondary" style="width: 5rem; height: 5rem; min-height: 10rem;" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div class="alert alert-secondary">
+      <span i18n:translate="payment_info_contact_us">Please contact us if you have questions or experience any problems.</span>
+      <a href=""
+        class="btn btn-primary"
+        tal:attributes="mailto: ${view/shop_admin_mail}?subject=E-Mail to ${view/shop_admin_name}"
+        i18n:translate="payment_button_contact_us">Contact us</a>
+    </div>
 
     <script src='${view/lightbox_script_url}' type='text/javascript'></script>
     <script type="text/javascript">
-
         $(document).ready(function () {
           window.LightboxCheckoutHandler.startPayment(undefined, function(){
                   alert('An error occurred during the initialization of the payment lightbox.');
           });
         });
     </script>
-
-
-
-    <!-- <p tal:content="structure view/message">
-      Success Message
-    </p> -->
-
-
-    <!-- <p i18n:translate="wallee_payment_success_text">
-      Your Order has been completed successful.
-    </p> -->
-
 
   </tal:main-macro>
 </metal:main>

@@ -19,20 +19,14 @@
     <div tal:attributes="data-order-salaried view/status_update">
     </div>
 
-    <p tal:content="structure view/message">
-      Success Message
-    </p>
-
-    <p i18n:translate="wallee_payment_success_text">
+    <p i18n:translate="wallee_payment_success_text" class="mb-4">
       Your Order has been completed successful.
     </p>
 
     <a href=""
        class="btn btn-primary"
        tal:attributes="href context/absolute_url"
-       i18n:translate="payment_done_continue">continue</a>
-
-
+       i18n:translate="payment_continue">continue</a>
 
   </tal:main-macro>
 </metal:main>

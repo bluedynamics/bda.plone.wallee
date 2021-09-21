@@ -80,7 +80,6 @@ class WalleePaymentLightbox(Payment):
 
 
 class WalleePaymentLightboxView(BrowserView, WalleeSettings):
-
     @property
     def shop_admin_mail(self):
         # This is a soft dependency indirection on bda.plone.shop
@@ -303,8 +302,6 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
 class TransactionView(BrowserView, WalleeSettings):
     """Handling of Wallee Transaction Respone"""
 
-
-
     @property
     def transaction(self):
         if "transaction_id" in self.request:
@@ -315,27 +312,20 @@ class TransactionView(BrowserView, WalleeSettings):
             transaction = transaction_service.read(
                 space_id=self.space_id, id=transaction_id
             )
-            import pprint
-            pprint.pprint(transaction)
             return transaction
 
     @property
     def message(self):
-        if "transaction_id" in self.request:
-            transaction_id = self.request.get("transaction_id")
-
-            config = Configuration(user_id=self.user_id, api_secret=self.api_secret)
-            transaction_service = TransactionServiceApi(configuration=config)
-            transaction = transaction_service.read(
-                space_id=self.space_id, id=transaction_id
-            )
-
-        print(transaction)
-        breakpoint()
-        return transaction
+        try:
+            return self.transaction.user_failure_message
+        except:
+            logger.warn("Could not extract user_failure_message")
 
     def status(self):
-        return ""
+        try:
+            return self.transaction.state
+        except:
+            logger.warn("Could not extract user_failure_message")
 
 
 class TransactionSuccessView(TransactionView):
@@ -346,9 +336,9 @@ class TransactionSuccessView(TransactionView):
         if "order_uid" in self.request and "transaction_id" in self.request:
             transaction_id = self.request.get("transaction_id")
             order_uid = self.request.get("order_uid")
-            breakpoint()
             order = OrderData(self.context, order_uid)
             order_tid = order.tid.pop()
             if order_tid == transaction_id:
                 order.salaried = "yes"
+                purge_cart(self.request)
             return order.salaried

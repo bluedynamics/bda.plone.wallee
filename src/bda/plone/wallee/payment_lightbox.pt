@@ -16,28 +16,31 @@
         i18n:translate="wallee_payment_title">Payment</h1>
     </header>
 
-    <div class="spinner-box w-auto d-flex justify-content-center align-items-center">
-      <div class="spinner-border text-secondary" style="width: 5rem; height: 5rem; min-height: 10rem;" role="status">
-        <span class="visually-hidden">Loading...</span>
+    <div class="wallee-loader p-5 pt-0">
+
+      <div class="spinner-box w-auto d-flex justify-content-center align-items-center mb-1"
+          >
+        <div class="spinner-border text-secondary" style="width: 5rem; height: 5rem;" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
       </div>
-    </div>
 
-    <div class="alert alert-secondary">
-      <span i18n:translate="payment_info_contact_us">Please contact us if you have questions or experience any problems.</span>
-      <a href=""
-        class="btn btn-primary"
-        tal:attributes="mailto: ${view/shop_admin_mail}?subject=E-Mail to ${view/shop_admin_name}"
-        i18n:translate="payment_button_contact_us">Contact us</a>
-    </div>
+      <div class="alert alert-light text-center d-flex flex-column ms-auto me-auto">
+        <p i18n:translate="payment_info_contact_us">Please contact us if you have questions or experience any problems.</p>
+        <a href="mailto:${python:view.shop_admin_mail}?subject=E-Mail to ${python:view.shop_admin_name}"
+          class="btn btn-primary align-self-center"
+          i18n:translate="payment_button_contact_us">Contact us</a>
+      </div>
 
-    <script src='${view/lightbox_script_url}' type='text/javascript'></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-          window.LightboxCheckoutHandler.startPayment(undefined, function(){
-                  alert('An error occurred during the initialization of the payment lightbox.');
+      <script src='${view/lightbox_script_url}' type='text/javascript'></script>
+      <script type="text/javascript">
+          $(document).ready(function () {
+            window.LightboxCheckoutHandler.startPayment(undefined, function(){
+                    alert('An error occurred during the initialization of the payment lightbox.');
+            });
           });
-        });
-    </script>
+      </script>
+    </div>
 
   </tal:main-macro>
 </metal:main>

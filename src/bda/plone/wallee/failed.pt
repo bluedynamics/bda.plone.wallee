@@ -16,18 +16,24 @@
         i18n:translate="wallee_payment_failed">Payment Failed</h1>
     </header>
 
-    <p tal:content="view/message">
+    <p tal:condition="view/message" class="mb-4" 
+      tal:content="view/message">
       Error Message
     </p>
 
-    <!-- <p>
+    <a href="" tal:condition="view/message" 
+       class="btn btn-primary"
+       tal:attributes="href context/absolute_url"
+       i18n:translate="payment_continue">continue</a>
+    
+    <p tal:condition="not:view/message">
       <span i18n:translate="wallee_payment_failed_questions">
         If you have questions, please contact
       </span>
       <a href="mailto:shopmaster@example.com"
          tal:attributes="href string:mailto:${view/shopmaster_mail}"
          i18n:translate="us">us</a>
-    </p> -->
+    </p>
 
   </tal:main-macro>
 </metal:main>

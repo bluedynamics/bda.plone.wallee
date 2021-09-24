@@ -39,6 +39,7 @@ from zope.component import getUtility
 from zope.i18nmessageid import MessageFactory
 from zope.event import notify
 
+import pycountry
 import transaction
 import logging
 
@@ -49,6 +50,11 @@ SKIP_RENDER_CART_PATTERNS.append("@@wallee_payment")
 SKIP_RENDER_CART_PATTERNS.append("@@wallee_payment_success")
 # SKIP_RENDER_CART_PATTERNS.append('@@wallee_payment_failed')
 
+def get_country_code(country_id):
+    if not country_id:
+        return None
+    country = pycountry.countries.get(numeric=country_id)
+    return country.alpha_2
 
 def get_wallee_settings():
     return getUtility(IRegistry).forInterface(interfaces.IWalleeSettings)
@@ -105,7 +111,7 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
 
         order = OrderData(self.context, uid=self.request.get("uid"))
         order_data = order.order.attrs
-
+        
         billing_address = {
             "gender": order_data.get("personal_data.gender", "").upper(),
             "givenName": order_data.get("personal_data.firstname", ""),
@@ -116,7 +122,7 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             "street": order_data.get("billing_address.street", ""),
             "postCode": order_data.get("billing_address.zip", ""),
             "city": order_data.get("billing_address.city", ""),
-            "country": order_data.get("billing_address.country", ""),
+            "country": get_country_code(order_data.get("billing_address.country", "")),
         }
 
         if order_data.get("delivery_address.alternative_delivery", ""):
@@ -130,7 +136,7 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
                 "street": order_data.get("delivery_address.street", ""),
                 "postCode": order_data.get("delivery_address.zip", ""),
                 "city": order_data.get("delivery_address.city", ""),
-                "country": order_data.get("delivery_address.country", ""),
+                "country": get_country_code(order_data.get("delivery_address.country", "")),
             }
         else:
             shipping_address = billing_address

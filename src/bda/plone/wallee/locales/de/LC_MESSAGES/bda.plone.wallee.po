@@ -97,10 +97,10 @@ msgstr "uns"
 msgid "wallee_payment"
 msgstr ""
 
-#. Default: "Payment Failed"
+#. Default: "Payment not executed"
 #: ../failed.pt:15
 msgid "wallee_payment_failed"
-msgstr "Zahlung fehlgeschlagen"
+msgstr "Zahlung nicht ausgeführt"
 
 #. Default: "If you have questions, please contact"
 #: ../failed.pt:30
@@ -115,7 +115,7 @@ msgstr "Bestellung erfolgreich abgeschlossen"
 #. Default: "Your Order has been completed successful."
 #: ../success.pt:22
 msgid "wallee_payment_success_text"
-msgstr "Ihre Bestellung wurde erfolgreich abgeschlossen."
+msgstr "Herzlichen Dank für Ihre Bestellung!"
 
 #. Default: "Payment"
 #: ../payment_lightbox.pt:15

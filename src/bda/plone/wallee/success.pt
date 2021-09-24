@@ -20,7 +20,7 @@
     </div>
 
     <p i18n:translate="wallee_payment_success_text" class="mb-4">
-      Your Order has been completed successful.
+      Thank you very much for your order!
     </p>
 
     <a href=""

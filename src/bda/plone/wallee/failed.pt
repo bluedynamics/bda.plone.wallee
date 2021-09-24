@@ -13,7 +13,7 @@
 
     <header>
       <h1 class="documentFirstHeading"
-        i18n:translate="wallee_payment_failed">Payment Failed</h1>
+        i18n:translate="wallee_payment_failed">Payment not executed</h1>
     </header>
 
     <p tal:condition="view/message" class="mb-4" 

@@ -1,8 +1,9 @@
 from bda.plone.cart.browser.portlet import SKIP_RENDER_CART_PATTERNS
-from bda.plone.cart.cartitem import purge_cart
 from bda.plone.cart.cart import get_data_provider
+from bda.plone.cart.cartitem import purge_cart
 from bda.plone.cart.utils import get_catalog_brain
 from bda.plone.cart.utils import get_object_by_uid
+from bda.plone.checkout import CheckoutDone
 from bda.plone.checkout.browser.form import checkout_button_factories
 from bda.plone.checkout.browser.form import confirmation_button_factories
 from bda.plone.checkout.browser.form import FieldsProvider
@@ -14,18 +15,16 @@ from bda.plone.checkout.browser.form import SVG_FINISH
 from bda.plone.checkout.interfaces import CheckoutError
 from bda.plone.checkout.interfaces import ICheckoutAdapter
 from bda.plone.checkout.interfaces import ICheckoutSettings
-from bda.plone.checkout import CheckoutDone
+from bda.plone.orders.datamanagers.order import OrderData
 from bda.plone.payment import Payment
 from bda.plone.payment import Payments
 from bda.plone.payment.interfaces import IPaymentData
-from bda.plone.orders.datamanagers.order import OrderData
 from bda.plone.shop.utils import get_shop_settings
 from bda.plone.shop.utils import get_shop_shipping_settings
 from bda.plone.wallee import interfaces
-from decimal import Decimal
-from plone.registry.interfaces import IRegistry
 from plone import api
 from plone.protect.utils import addTokenToUrl
+from plone.registry.interfaces import IRegistry
 from Products.Five import BrowserView
 from wallee import Configuration
 from wallee.api import TransactionLightboxServiceApi
@@ -33,30 +32,32 @@ from wallee.api import TransactionPaymentPageServiceApi
 from wallee.api import TransactionServiceApi
 from wallee.models import LineItem
 from wallee.models import LineItemType
-from wallee.models import TransactionCreate
 from wallee.models import Tax
+from wallee.models import TransactionCreate
 from yafowil.base import factory
 from zope.component import getMultiAdapter
 from zope.component import getUtility
-from zope.i18nmessageid import MessageFactory
 from zope.event import notify
+from zope.i18nmessageid import MessageFactory
 
+import logging
 import pycountry
 import transaction
-import logging
+
 
 logger = logging.getLogger(__name__)
 _ = MessageFactory("bda.plone.wallee")
 
 SKIP_RENDER_CART_PATTERNS.append("@@wallee_payment")
 SKIP_RENDER_CART_PATTERNS.append("@@wallee_payment_success")
-# SKIP_RENDER_CART_PATTERNS.append('@@wallee_payment_failed')
+
 
 def get_country_code(country_id):
     if not country_id:
         return None
     country = pycountry.countries.get(numeric=country_id)
     return country.alpha_2
+
 
 def get_wallee_settings():
     return getUtility(IRegistry).forInterface(interfaces.IWalleeSettings)
@@ -109,11 +110,10 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
         return "(no shopmaster name set)"
 
     def lightbox_script_url(self):
-        # breakpoint()
 
         order = OrderData(self.context, uid=self.request.get("uid"))
         order_data = order.order.attrs
-        
+
         billing_address = {
             "gender": order_data.get("personal_data.gender", "").upper(),
             "givenName": order_data.get("personal_data.firstname", ""),
@@ -129,23 +129,21 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
 
         if order_data.get("delivery_address.alternative_delivery", ""):
             shipping_address = {
-                # "gender": order_data.get("checkout.personal_data.gender", "").upper(),
                 "givenName": order_data.get("delivery_address.firstname", ""),
                 "familyName": order_data.get("delivery_address.lastname", ""),
                 "organisationName": order_data.get("delivery_address.company", ""),
-                # "emailAddress": order_data.get("checkout.personal_data.email", ""),
-                # "phoneNumber": order_data.get("checkout.personal_data.phone", ""),
                 "street": order_data.get("delivery_address.street", ""),
                 "postCode": order_data.get("delivery_address.zip", ""),
                 "city": order_data.get("delivery_address.city", ""),
-                "country": get_country_code(order_data.get("delivery_address.country", "")),
+                "country": get_country_code(
+                    order_data.get("delivery_address.country", "")
+                ),
             }
         else:
             shipping_address = billing_address
 
         # create line items
         line_items = []
-        # breakpoint()
 
         for booking in order.bookings:
             booking_data = booking.attrs
@@ -189,18 +187,9 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
                     rate=float(booking_data["vat"]),
                 )
             )
-            # amountIncludingTax = booking_data.get("cart_item_price", ""))
-            # breakpoint()
 
             tax_amount_per_unit = unit_price_excluding_tax / 100 * vat
             tax_amount = amount_excluding_tax / 100 * vat
-
-            # if booking_data.get("cart_item_discount", ""):
-            #     discounted_net = booking_data["net"] - booking_data["discount_net"]
-            #     amountExcludingTax = discounted_net
-            #     amountIncludingTax = discounted_net + (
-            #         discounted_net / 100 * booking_data["vat"]
-            #     )
 
             line_items.append(
                 LineItem(
@@ -236,7 +225,6 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
 
             name = _("shipping", default="Shipping")
             quantity = 1
-            breakpoint()
 
             settings = get_shop_shipping_settings()
 
@@ -270,7 +258,6 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             name = _("cart_discount", default="Discount")
             quantity = 1
 
-            # sku = needed?
             line_items.append(
                 LineItem(
                     name=api.portal.translate(name),
@@ -280,8 +267,6 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
                     type=LineItemType.DISCOUNT,
                 )
             )
-
-        # breakpoint()
 
         nav_root = api.portal.get_navigation_root(self)
         base = nav_root.absolute_url()
@@ -295,7 +280,6 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
         transaction_lightbox_service_api = TransactionLightboxServiceApi(
             configuration=config
         )
-        # breakpoint()
 
         # create transaction model
         transaction = TransactionCreate(
@@ -307,26 +291,18 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             merchant_reference=order_data["ordernumber"],
         )
 
+        # create transaction with transaction_service
         try:
             transaction = transaction_service.create(
                 space_id=space_id, transaction=transaction
             )
         except Exception:
-            logger.exception("Could not initalize wallee lightbox")
-            self.request.response.redirect(f"{self.context.absolute_url()}/@@wallee_error")
-
-
-
-        # transaction = TransactionCreate(
-        #     id=transaction.id,
-        #     version=transaction.version,
-        #     success_url=addTokenToUrl(
-        #         f"{base}/@@wallee_payment_success/?order_uid={str(order.uid)}&transaction_id={transaction.id}"
-        #     ),
-        #     failed_url=addTokenToUrl(
-        #         f"{base}/@@wallee_payment_failed/?order_uid={str(order.uid)}&transaction_id={transaction.id}"
-        #     ),
-        # )
+            logger.exception(
+                "Could not create transaction and initalize wallee lightbox"
+            )
+            self.request.response.redirect(
+                f"{self.context.absolute_url()}/@@wallee_error"
+            )
 
         transaction.success_url = addTokenToUrl(
             f"{base}/@@wallee_payment_success/?order_uid={str(order.uid)}&transaction_id={transaction.id}"
@@ -336,24 +312,17 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             f"{base}/@@wallee_payment_failed/?order_uid={str(order.uid)}&transaction_id={transaction.id}"
         )
 
-        transaction_service.update(
-            space_id=space_id,
-            entity=transaction,
-        )
-        # breakpoint()
-        # try / except / catch error
-        # transaction_create = transaction_service.create(
-        #     space_id=space_id, transaction=transaction
-        # )
-
-        # transaction_id = transaction_create.id
-        # transaction_service.read(space_id=space_id, id=transaction.id)
-        # transaction.success_url = f"{transaction.success_url}/transaction_id={transaction_id}"
-        # transaction.failed_url = f"{transaction.failed_url}/transaction_id={transaction_id}"
-
-        # print(transaction)
-        order.tid = str(transaction.id)
-        # breakpoint()
+        # update transaction with transaction_service
+        try:
+            transaction_service.update(
+                space_id=space_id,
+                entity=transaction,
+            )
+        except Exception:
+            logger.exception("Could not update transaction for wallee lightbox")
+            self.request.response.redirect(
+                f"{self.context.absolute_url()}/@@wallee_error"
+            )
 
         return transaction_lightbox_service_api.javascript_url(space_id, transaction.id)
 
@@ -391,7 +360,6 @@ class TransactionSuccessView(TransactionView):
     """On Success empty cart & mark order as salaried"""
 
     def status_update(self):
-        # breakpoint()
         if "order_uid" in self.request and "transaction_id" in self.request:
             transaction_id = self.request.get("transaction_id")
             order_uid = self.request.get("order_uid")

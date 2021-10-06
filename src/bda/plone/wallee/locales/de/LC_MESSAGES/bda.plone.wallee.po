@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-09-21 18:59+0000\n"
+"POT-Creation-Date: 2021-10-06 17:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,11 +14,11 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
 
-#: ../configure.zcml:49
+#: ../configure.zcml:56
 msgid "Installs the bda.plone.wallee add-on."
 msgstr ""
 
-#: ../configure.zcml:58
+#: ../configure.zcml:65
 msgid "Uninstalls the bda.plone.wallee add-on."
 msgstr ""
 
@@ -27,28 +27,18 @@ msgstr ""
 msgid "Wallee"
 msgstr ""
 
-#: ../configure.zcml:49
+#: ../configure.zcml:56
 msgid "bda.plone.wallee"
 msgstr ""
 
-#: ../configure.zcml:58
+#: ../configure.zcml:65
 msgid "bda.plone.wallee (uninstall)"
 msgstr ""
 
 #. Default: "Discount"
-#: ../__init__.py:217
+#: ../__init__.py:258
 msgid "cart_discount"
 msgstr "Rabatt"
-
-#. Default: "Discount"
-#: ../payment_lightbox_button.py:239
-msgid "discount"
-msgstr "Rabatt"
-
-#. Default: "Order with Wallee now ${icon}"
-#: ../payment_lightbox_button.py:346
-msgid "finish"
-msgstr ""
 
 #. Default: "API Secret"
 #: ../interfaces.py:34
@@ -66,6 +56,7 @@ msgid "label_user_id"
 msgstr ""
 
 #. Default: "Contact us"
+#: ../error.pt:23
 #: ../payment_lightbox.pt:30
 msgid "payment_button_contact_us"
 msgstr "Kontakt aufnehmen"
@@ -76,24 +67,32 @@ msgstr "Kontakt aufnehmen"
 msgid "payment_continue"
 msgstr "Weiter"
 
+#. Default: "Please contact us in case of a problem."
+#: ../error.pt:22
+msgid "payment_error_contact_us"
+msgstr "Bitte kontaktieren Sie uns, falls ein Problem auftritt."
+
 #. Default: "Please contact us if you have questions or experience any problems."
 #: ../payment_lightbox.pt:29
 msgid "payment_info_contact_us"
-msgstr ""
+msgstr "Bitte kontaktieren Sie uns, wenn Sie Fragen haben oder Probleme auftreten."
 
 #. Default: "Shipping"
-#: ../__init__.py:197
-#: ../payment_lightbox_button.py:218
+#: ../__init__.py:226
 msgid "shipping"
 msgstr "Versand"
+
+#. Default: "Vat."
+#: ../__init__.py:182
+msgid "tax_type"
+msgstr "Mwst."
 
 #: ../failed.pt:33
 msgid "us"
 msgstr "uns"
 
 #. Default: "Wallee Payment Lightbox"
-#: ../__init__.py:73
-#: ../payment_lightbox_button.py:52
+#: ../__init__.py:82
 msgid "wallee_payment"
 msgstr ""
 
@@ -112,12 +111,13 @@ msgstr "Wenn Sie Fragen haben, bitte kontaktieren Sie"
 msgid "wallee_payment_success"
 msgstr "Bestellung erfolgreich abgeschlossen"
 
-#. Default: "Your Order has been completed successful."
+#. Default: "Thank you very much for your order!"
 #: ../success.pt:22
 msgid "wallee_payment_success_text"
 msgstr "Herzlichen Dank für Ihre Bestellung!"
 
 #. Default: "Payment"
+#: ../error.pt:15
 #: ../payment_lightbox.pt:15
 msgid "wallee_payment_title"
 msgstr "Zahlung"

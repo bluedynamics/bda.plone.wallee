@@ -20,6 +20,7 @@ from bda.plone.payment import Payments
 from bda.plone.payment.interfaces import IPaymentData
 from bda.plone.orders.datamanagers.order import OrderData
 from bda.plone.shop.utils import get_shop_settings
+from bda.plone.shop.utils import get_shop_shipping_settings
 from bda.plone.wallee import interfaces
 from decimal import Decimal
 from plone.registry.interfaces import IRegistry
@@ -33,6 +34,7 @@ from wallee.api import TransactionServiceApi
 from wallee.models import LineItem
 from wallee.models import LineItemType
 from wallee.models import TransactionCreate
+from wallee.models import Tax
 from yafowil.base import factory
 from zope.component import getMultiAdapter
 from zope.component import getUtility
@@ -155,21 +157,50 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             unique_id = booking_data["buyable_uid"]
 
             sku = article.get("item_number", article.id)
+            vat = booking_data["vat"]
 
             quantity = int(booking_data["buyable_count"])
-            # if booking.get("quantity_unit_float", ""):
-            #     quantity = float(booking.get("cart_item_count"))
 
-            # amountIncludingTax = booking_data.get("cart_item_price", ""))
-            amountIncludingTax = booking_data["net"] + (
-                booking_data["net"] / 100 * booking_data["vat"]
+            undiscounted_unit_price_excluding_tax = booking_data["net"]
+            undiscounted_unit_price_including_tax = (
+                undiscounted_unit_price_excluding_tax / 100 * (100 + vat)
             )
 
-            if booking_data.get("cart_item_discount", ""):
-                discounted_net = booking_data["net"] - booking_data["discount_net"]
-                amountIncludingTax = discounted_net + (
-                    discounted_net / 100 * booking_data["vat"]
+            unit_price_excluding_tax = (
+                undiscounted_unit_price_excluding_tax - booking_data["discount_net"]
+            )
+            unit_price_including_tax = unit_price_excluding_tax / 100 * (100 + vat)
+
+            undiscounted_amount_excluding_tax = (
+                undiscounted_unit_price_excluding_tax * quantity
+            )
+            undiscounted_amount_including_tax = (
+                undiscounted_unit_price_including_tax * quantity
+            )
+
+            amount_excluding_tax = unit_price_excluding_tax * quantity
+            amount_including_tax = unit_price_including_tax * quantity
+
+            tax_type = _("tax_type", default="Vat.")
+            taxes = []
+            taxes.append(
+                Tax(
+                    title=api.portal.translate(tax_type),
+                    rate=float(booking_data["vat"]),
                 )
+            )
+            # amountIncludingTax = booking_data.get("cart_item_price", ""))
+            # breakpoint()
+
+            tax_amount_per_unit = unit_price_excluding_tax / 100 * vat
+            tax_amount = amount_excluding_tax / 100 * vat
+
+            # if booking_data.get("cart_item_discount", ""):
+            #     discounted_net = booking_data["net"] - booking_data["discount_net"]
+            #     amountExcludingTax = discounted_net
+            #     amountIncludingTax = discounted_net + (
+            #         discounted_net / 100 * booking_data["vat"]
+            #     )
 
             line_items.append(
                 LineItem(
@@ -177,39 +208,55 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
                     unique_id=unique_id,
                     sku=sku,
                     quantity=quantity,
-                    amount_including_tax=float(f"{amountIncludingTax:.2f}"),
+                    undiscounted_unit_price_excluding_tax=float(
+                        f"{undiscounted_unit_price_excluding_tax:.2f}"
+                    ),
+                    undiscounted_unit_price_including_tax=float(
+                        f"{undiscounted_unit_price_including_tax:.2f}"
+                    ),
+                    unit_price_excluding_tax=float(f"{unit_price_excluding_tax:.2f}"),
+                    unit_price_including_tax=float(f"{unit_price_including_tax:.2f}"),
+                    undiscounted_amount_excluding_tax=float(
+                        f"{undiscounted_amount_excluding_tax:.2f}"
+                    ),
+                    undiscounted_amount_including_tax=float(
+                        f"{undiscounted_amount_including_tax:.2f}"
+                    ),
+                    amount_including_tax=float(f"{amount_including_tax:.2f}"),
+                    amount_excluding_tax=float(f"{amount_excluding_tax:.2f}"),
+                    aggregated_tax_rate=float(vat),
+                    tax_amount_per_unit=float(f"{tax_amount_per_unit:.2f}"),
+                    tax_amount=float(f"{tax_amount:.2f}"),
+                    taxes=taxes,
                     type=LineItemType.PRODUCT,
                 )
             )
 
-        # static line_item
-        # line_items.append(
-        #     LineItem(
-        #         name="Red T-Shirt",
-        #         unique_id="5412",
-        #         sku="red-t-shirt-123",
-        #         quantity=1,
-        #         amount_including_tax=29.95,
-        #         type=LineItemType.PRODUCT,
-        #     )
-        # )
-
         if "shipping" in order_data and order_data["shipping"]:
 
-            # net = shipping.get("net")
-            # vat = shipping.get("vat")
-
-            # amountIncludingTax = net + vat
             name = _("shipping", default="Shipping")
             quantity = 1
+            breakpoint()
 
-            # sku = needed?
+            settings = get_shop_shipping_settings()
+
+            taxes = []
+            taxes.append(
+                Tax(
+                    title=api.portal.translate(tax_type),
+                    rate=float(settings.shipping_vat),
+                )
+            )
+
             line_items.append(
                 LineItem(
-                    name=name,
+                    name=api.portal.translate(name),
                     unique_id="shipping",
                     quantity=quantity,
+                    aggregated_tax_rate=float(order_data["shipping_vat"]),
+                    amount_excluding_tax=float(f"{order_data['shipping_net']:.2f}"),
                     amount_including_tax=float(f"{order_data['shipping']:.2f}"),
+                    taxes=taxes,
                     type=LineItemType.SHIPPING,
                 )
             )
@@ -226,7 +273,7 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             # sku = needed?
             line_items.append(
                 LineItem(
-                    name=name,
+                    name=api.portal.translate(name),
                     unique_id="cart_discount",
                     quantity=quantity,
                     amount_including_tax=float(f"{amountIncludingTax:.2f}"),

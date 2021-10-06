@@ -31,33 +31,14 @@
 bda.plone.wallee
 ================
 
-Tell me what your product does
+Wallee payment integration for bda.plone.shop
+
 
 Features
 --------
 
-- Can be bullet points
+- Lightbox Payment for https://wallee.com/
 
-
-Examples
---------
-
-This add-on can be seen in action at the following sites:
-- Is there a page on the internet where everybody can see the features?
-
-
-Documentation
--------------
-
-Full documentation for end users can be found in the "docs" folder, and is also available online at http://docs.plone.org/foo/bar
-
-
-Translations
-------------
-
-This product has been translated into
-
-- Klingon (thanks, K'Plai)
 
 
 Installation
@@ -75,34 +56,29 @@ Install bda.plone.wallee by adding it to your buildout::
 
 and then running ``bin/buildout``
 
+Activate the bda.plone.wallee in Plone controlpanel and add your wallee credentials 
+in corresponding tab of the bda.plone.shop settings.
 
-Authors
--------
-
-Provided by awesome people ;)
+Important: This integration does NOT initiate email sendouts. 
+Email sendout is expected to be configured and done from within wallee. 
 
 
 Contributors
 ------------
 
-Put your name here, you deserve it!
-
-- ?
-
-
-Contribute
-----------
+We'd be happy to see many forks and pull-requests to make this program even better.
+Professional support is offered by the maintainers and some of the authors.
 
 - Issue Tracker: https://github.com/collective/bda.plone.wallee/issues
 - Source Code: https://github.com/collective/bda.plone.wallee
-- Documentation: https://docs.plone.org/foo/bar
 
 
-Support
+Authors
 -------
 
-If you are having issues, please let us know.
-We have a mailing list located at: project@example.com
+- Peter Holzer
+
+Contact: `dev@bluedynamics.com <mailto:dev@bluedynamics.com>`_
 
 
 License

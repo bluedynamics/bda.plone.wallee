@@ -307,9 +307,15 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             merchant_reference=order_data["ordernumber"],
         )
 
-        transaction = transaction_service.create(
-            space_id=space_id, transaction=transaction
-        )
+        try:
+            transaction = transaction_service.create(
+                space_id=space_id, transaction=transaction
+            )
+        except Exception:
+            logger.exception("Could not initalize wallee lightbox")
+            self.request.response.redirect(f"{self.context.absolute_url()}/@@wallee_error")
+
+
 
         # transaction = TransactionCreate(
         #     id=transaction.id,

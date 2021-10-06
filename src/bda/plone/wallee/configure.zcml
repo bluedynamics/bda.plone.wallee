@@ -26,6 +26,13 @@
 
   <browser:page
     for="*"
+    name="wallee_error"
+    class="bda.plone.wallee.WalleePaymentLightboxView"
+    template="error.pt"
+    permission="zope2.View" />
+
+  <browser:page
+    for="*"
     name="wallee_payment_success"
     class="bda.plone.wallee.TransactionSuccessView"
     template="success.pt"

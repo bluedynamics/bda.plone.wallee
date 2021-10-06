@@ -1,0 +1,34 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="bda.plone.wallee">
+
+<body>
+
+<metal:main fill-slot="main">
+  <tal:main-macro metal:define-macro="main">
+
+    <header>
+      <h1 class="documentFirstHeading"
+        i18n:translate="wallee_payment_title">Payment</h1>
+    </header>
+
+    <div class="wallee-error p-5 pt-0">
+
+      <div class="alert alert-light text-center d-flex flex-column ms-auto me-auto">
+        <p i18n:translate="payment_error_contact_us">Please contact us in case of a problem.</p>
+        <a href="mailto:${python:view.shop_admin_mail}?subject=E-Mail to ${python:view.shop_admin_name}"
+          class="btn btn-primary align-self-center"
+          i18n:translate="payment_button_contact_us">Contact us</a>
+      </div>
+
+    </div>
+
+  </tal:main-macro>
+</metal:main>
+
+</body>
+</html>

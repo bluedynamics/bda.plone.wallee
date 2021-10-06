@@ -43,7 +43,7 @@ msgstr "Rabatt"
 #. Default: "Discount"
 #: ../payment_lightbox_button.py:239
 msgid "discount"
-msgstr ""
+msgstr "Rabatt"
 
 #. Default: "Order with Wallee now ${icon}"
 #: ../payment_lightbox_button.py:346

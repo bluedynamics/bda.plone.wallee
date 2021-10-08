@@ -19,10 +19,11 @@
     <div class="wallee-error p-5 pt-0">
 
       <div class="alert alert-light text-center d-flex flex-column ms-auto me-auto">
-        <p i18n:translate="payment_error_contact_us">Please contact us in case of a problem.</p>
-        <a href="mailto:${python:view.shop_admin_mail}?subject=E-Mail to ${python:view.shop_admin_name}"
+        <h2 i18n:translate="payment_sorry_header">We are sorry :-(</h2>
+        <p i18n:translate="payment_error_init">Payment couldn't be initialized.</p>
+        <a href="mailto:${python:view.shop_admin_mail}?subject=Shope Payment Error: E-Mail to ${python:view.shop_admin_name}"
           class="btn btn-primary align-self-center"
-          i18n:translate="payment_button_contact_us">Contact us</a>
+          i18n:translate="payment_button_contact_us">Please Contact Us</a>
       </div>
 
     </div>

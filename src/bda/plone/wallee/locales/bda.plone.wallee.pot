@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-10-08 16:10+0000\n"
+"POT-Creation-Date: 2021-10-08 16:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,10 +58,14 @@ msgstr ""
 msgid "label_user_id"
 msgstr ""
 
-#. Default: "Please Contact Us"
-#: ../error.pt:24
+#. Default: "Contact us"
 #: ../payment_lightbox.pt:30
 msgid "payment_button_contact_us"
+msgstr ""
+
+#. Default: "Please Contact Us"
+#: ../error.pt:24
+msgid "payment_button_please_contact_us"
 msgstr ""
 
 #. Default: "continue"

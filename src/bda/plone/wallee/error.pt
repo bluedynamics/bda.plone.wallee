@@ -23,7 +23,7 @@
         <p i18n:translate="payment_error_init">Payment couldn't be initialized.</p>
         <a href="mailto:${python:view.shop_admin_mail}?subject=Shope Payment Error: E-Mail to ${python:view.shop_admin_name}"
           class="btn btn-primary align-self-center"
-          i18n:translate="payment_button_contact_us">Please Contact Us</a>
+          i18n:translate="payment_button_please_contact_us">Please Contact Us</a>
       </div>
 
     </div>

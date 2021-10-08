@@ -305,7 +305,7 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             logger.exception(
                 "Could not create transaction and initalize wallee lightbox"
             )
-            self.request.response.redirect(
+            return self.request.response.redirect(
                 f"{self.context.absolute_url()}/@@wallee_error"
             )
 
@@ -325,7 +325,7 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             )
         except Exception:
             logger.exception("Could not update transaction for wallee lightbox")
-            self.request.response.redirect(
+            return self.request.response.redirect(
                 f"{self.context.absolute_url()}/@@wallee_error"
             )
 

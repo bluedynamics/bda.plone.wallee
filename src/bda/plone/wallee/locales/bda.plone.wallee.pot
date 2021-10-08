@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-10-06 17:40+0000\n"
+"POT-Creation-Date: 2021-10-08 16:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,7 +39,7 @@ msgid "bda.plone.wallee (uninstall)"
 msgstr ""
 
 #. Default: "Discount"
-#: ../__init__.py:258
+#: ../__init__.py:263
 msgid "cart_discount"
 msgstr ""
 
@@ -58,8 +58,8 @@ msgstr ""
 msgid "label_user_id"
 msgstr ""
 
-#. Default: "Contact us"
-#: ../error.pt:23
+#. Default: "Please Contact Us"
+#: ../error.pt:24
 #: ../payment_lightbox.pt:30
 msgid "payment_button_contact_us"
 msgstr ""
@@ -70,9 +70,9 @@ msgstr ""
 msgid "payment_continue"
 msgstr ""
 
-#. Default: "Please contact us in case of a problem."
-#: ../error.pt:22
-msgid "payment_error_contact_us"
+#. Default: "Payment couldn't be initialized."
+#: ../error.pt:23
+msgid "payment_error_init"
 msgstr ""
 
 #. Default: "Please contact us if you have questions or experience any problems."
@@ -80,13 +80,18 @@ msgstr ""
 msgid "payment_info_contact_us"
 msgstr ""
 
+#. Default: "We are sorry :-("
+#: ../error.pt:22
+msgid "payment_sorry_header"
+msgstr ""
+
 #. Default: "Shipping"
-#: ../__init__.py:226
+#: ../__init__.py:231
 msgid "shipping"
 msgstr ""
 
 #. Default: "Vat."
-#: ../__init__.py:182
+#: ../__init__.py:187
 msgid "tax_type"
 msgstr ""
 

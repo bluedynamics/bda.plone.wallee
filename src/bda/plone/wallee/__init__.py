@@ -114,8 +114,13 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
         order = OrderData(self.context, uid=self.request.get("uid"))
         order_data = order.order.attrs
 
+        if order_data.get("personal_data.gender", "") not in ("male", "female"):
+            gender = ""
+        else:
+            gender = order_data.get("personal_data.gender")
+
         billing_address = {
-            "gender": order_data.get("personal_data.gender", "").upper(),
+            "gender": gender.upper(),
             "givenName": order_data.get("personal_data.firstname", ""),
             "familyName": order_data.get("personal_data.lastname", ""),
             "organisationName": order_data.get("personal_data.company", ""),

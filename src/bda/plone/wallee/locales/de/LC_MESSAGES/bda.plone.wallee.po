@@ -74,7 +74,7 @@ msgstr "Weiter"
 #. Default: "Payment couldn't be initialized."
 #: ../error.pt:23
 msgid "payment_error_init"
-msgstr "Zahlungsprozess konnte nicht gestartet werden."
+msgstr "Der Zahlungsprozess konnte nicht gestartet werden."
 
 #. Default: "Please contact us if you have questions or experience any problems."
 #: ../payment_lightbox.pt:29

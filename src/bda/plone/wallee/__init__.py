@@ -59,6 +59,26 @@ def get_country_code(country_id):
     return country.alpha_2
 
 
+def shop_admin_mail():
+    # This is a soft dependency indirection on bda.plone.shop
+    entry = "bda.plone.shop.interfaces.IShopSettings.admin_email"
+    shop_email = api.portal.get_registry_record(name=entry, default=None)
+    if shop_email is not None:
+        return shop_email
+    logger.warning("No shop master email was set.")
+    return "(no shopmaster email set)"
+
+
+def shop_admin_name():
+    # This is a soft dependency indirection on bda.plone.shop
+    entry = "bda.plone.shop.interfaces.IShopSettings.admin_name"
+    shop_name = api.portal.get_registry_record(name=entry, default=None)
+    if shop_name is not None:
+        return shop_name
+    logger.warning("No shop master name was set.")
+    return "(no shopmaster name set)"
+
+
 def get_wallee_settings():
     return getUtility(IRegistry).forInterface(interfaces.IWalleeSettings)
 
@@ -89,25 +109,7 @@ class WalleePaymentLightbox(Payment):
 
 
 class WalleePaymentLightboxView(BrowserView, WalleeSettings):
-    @property
-    def shop_admin_mail(self):
-        # This is a soft dependency indirection on bda.plone.shop
-        entry = "bda.plone.shop.interfaces.IShopSettings.admin_email"
-        shop_email = api.portal.get_registry_record(name=entry, default=None)
-        if shop_email is not None:
-            return shop_email
-        logger.warning("No shop master email was set.")
-        return "(no shopmaster email set)"
 
-    @property
-    def shop_admin_name(self):
-        # This is a soft dependency indirection on bda.plone.shop
-        entry = "bda.plone.shop.interfaces.IShopSettings.admin_name"
-        shop_name = api.portal.get_registry_record(name=entry, default=None)
-        if shop_name is not None:
-            return shop_name
-        logger.warning("No shop master name was set.")
-        return "(no shopmaster name set)"
 
     def lightbox_script_url(self):
 
@@ -337,6 +339,15 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
 
 class TransactionView(BrowserView, WalleeSettings):
     """Handling of Wallee Transaction Respone"""
+
+    @property
+    def shop_admin_mail(self):
+        return shop_admin_mail()
+
+    @property
+    def shop_admin_name(self):
+        return shop_admin_name()
+
 
     @property
     def transaction(self):

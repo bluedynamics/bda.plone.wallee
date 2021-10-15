@@ -16,7 +16,8 @@
         i18n:translate="wallee_payment_success">Payment Success</h1>
     </header>
 
-    <div tal:attributes="data-order-salaried view/status_update">
+    <div tal:attributes="data-order-salaried view/status_update;
+                         data-order-state view/status">
     </div>
 
     <p i18n:translate="wallee_payment_success_text" class="mb-4">

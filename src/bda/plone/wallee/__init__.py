@@ -110,6 +110,13 @@ class WalleePaymentLightbox(Payment):
 
 class WalleePaymentLightboxView(BrowserView, WalleeSettings):
 
+    @property
+    def shop_admin_mail(self):
+        return shop_admin_mail()
+
+    @property
+    def shop_admin_name(self):
+        return shop_admin_name()
 
     def lightbox_script_url(self):
 

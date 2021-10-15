@@ -59,6 +59,26 @@ def get_country_code(country_id):
     return country.alpha_2
 
 
+def shop_admin_mail():
+    # This is a soft dependency indirection on bda.plone.shop
+    entry = "bda.plone.shop.interfaces.IShopSettings.admin_email"
+    shop_email = api.portal.get_registry_record(name=entry, default=None)
+    if shop_email is not None:
+        return shop_email
+    logger.warning("No shop master email was set.")
+    return "(no shopmaster email set)"
+
+
+def shop_admin_name():
+    # This is a soft dependency indirection on bda.plone.shop
+    entry = "bda.plone.shop.interfaces.IShopSettings.admin_name"
+    shop_name = api.portal.get_registry_record(name=entry, default=None)
+    if shop_name is not None:
+        return shop_name
+    logger.warning("No shop master name was set.")
+    return "(no shopmaster name set)"
+
+
 def get_wallee_settings():
     return getUtility(IRegistry).forInterface(interfaces.IWalleeSettings)
 
@@ -89,25 +109,7 @@ class WalleePaymentLightbox(Payment):
 
 
 class WalleePaymentLightboxView(BrowserView, WalleeSettings):
-    @property
-    def shop_admin_mail(self):
-        # This is a soft dependency indirection on bda.plone.shop
-        entry = "bda.plone.shop.interfaces.IShopSettings.admin_email"
-        shop_email = api.portal.get_registry_record(name=entry, default=None)
-        if shop_email is not None:
-            return shop_email
-        logger.warning("No shop master email was set.")
-        return "(no shopmaster email set)"
 
-    @property
-    def shop_admin_name(self):
-        # This is a soft dependency indirection on bda.plone.shop
-        entry = "bda.plone.shop.interfaces.IShopSettings.admin_name"
-        shop_name = api.portal.get_registry_record(name=entry, default=None)
-        if shop_name is not None:
-            return shop_name
-        logger.warning("No shop master name was set.")
-        return "(no shopmaster name set)"
 
     def lightbox_script_url(self):
 
@@ -329,6 +331,9 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
                 f"{self.context.absolute_url()}/@@wallee_error"
             )
 
+        logger.info(
+            f"Creating lightbox for order_uid {order.uid} with transaction_id {transaction.id}"
+        )
         return transaction_lightbox_service_api.javascript_url(space_id, transaction.id)
 
 
@@ -336,14 +341,25 @@ class TransactionView(BrowserView, WalleeSettings):
     """Handling of Wallee Transaction Respone"""
 
     @property
+    def shop_admin_mail(self):
+        return shop_admin_mail()
+
+    @property
+    def shop_admin_name(self):
+        return shop_admin_name()
+
+
+    @property
     def transaction(self):
         if "transaction_id" in self.request:
             transaction_id = self.request.get("transaction_id")
-
             config = Configuration(user_id=self.user_id, api_secret=self.api_secret)
             transaction_service = TransactionServiceApi(configuration=config)
             transaction = transaction_service.read(
                 space_id=self.space_id, id=transaction_id
+            )
+            logger.info(
+                f"Transaction {transaction_id} status: {transaction.state}"
             )
             return transaction
 
@@ -352,13 +368,13 @@ class TransactionView(BrowserView, WalleeSettings):
         try:
             return self.transaction.user_failure_message
         except:
-            logger.warn("Could not extract user_failure_message")
+            logger.warning("Could not extract user_failure_message")
 
     def status(self):
         try:
             return self.transaction.state
         except:
-            logger.warn("Could not extract user_failure_message")
+            logger.warning("Could not extract user_failure_message")
 
 
 class TransactionSuccessView(TransactionView):
@@ -373,4 +389,14 @@ class TransactionSuccessView(TransactionView):
             if order_tid == transaction_id:
                 order.salaried = "yes"
                 purge_cart(self.request)
-            return order.salaried
+                logger.info(
+                    f"Update salaried status order_uid {order_uid} with transaction_id {transaction_id}"
+                )
+                return order.salaried
+            else:
+                logger.warning(
+                    f"order_uid {order_uid} and transaction_id {transaction_id} do not match"
+                )
+        logger.warning(
+            f"Could not update salaried status on success page: {self.request.form}"
+        )

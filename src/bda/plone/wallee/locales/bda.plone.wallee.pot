@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-10-08 16:16+0000\n"
+"POT-Creation-Date: 2021-10-15 08:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,7 +39,7 @@ msgid "bda.plone.wallee (uninstall)"
 msgstr ""
 
 #. Default: "Discount"
-#: ../__init__.py:263
+#: ../__init__.py:265
 msgid "cart_discount"
 msgstr ""
 
@@ -70,7 +70,7 @@ msgstr ""
 
 #. Default: "continue"
 #: ../failed.pt:24
-#: ../success.pt:26
+#: ../success.pt:27
 msgid "payment_continue"
 msgstr ""
 
@@ -89,22 +89,23 @@ msgstr ""
 msgid "payment_sorry_header"
 msgstr ""
 
+#. Default: "please contact us"
+#: ../failed.pt:34
+msgid "please_contact_us"
+msgstr ""
+
 #. Default: "Shipping"
-#: ../__init__.py:231
+#: ../__init__.py:233
 msgid "shipping"
 msgstr ""
 
 #. Default: "Vat."
-#: ../__init__.py:187
+#: ../__init__.py:189
 msgid "tax_type"
 msgstr ""
 
-#: ../failed.pt:33
-msgid "us"
-msgstr ""
-
 #. Default: "Wallee Payment Lightbox"
-#: ../__init__.py:82
+#: ../__init__.py:102
 msgid "wallee_payment"
 msgstr ""
 
@@ -113,9 +114,9 @@ msgstr ""
 msgid "wallee_payment_failed"
 msgstr ""
 
-#. Default: "If you have questions, please contact"
+#. Default: "If you have questions,"
 #: ../failed.pt:30
-msgid "wallee_payment_failed_questions"
+msgid "wallee_payment_questions"
 msgstr ""
 
 #. Default: "Payment Success"
@@ -124,7 +125,7 @@ msgid "wallee_payment_success"
 msgstr ""
 
 #. Default: "Thank you very much for your order!"
-#: ../success.pt:22
+#: ../success.pt:23
 msgid "wallee_payment_success_text"
 msgstr ""
 

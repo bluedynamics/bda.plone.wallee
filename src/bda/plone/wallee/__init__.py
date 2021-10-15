@@ -329,6 +329,9 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
                 f"{self.context.absolute_url()}/@@wallee_error"
             )
 
+        logger.info(
+            f"Creating lightbox for order_uid {order.uid} with transaction_id {transaction.id}"
+        )
         return transaction_lightbox_service_api.javascript_url(space_id, transaction.id)
 
 
@@ -339,11 +342,13 @@ class TransactionView(BrowserView, WalleeSettings):
     def transaction(self):
         if "transaction_id" in self.request:
             transaction_id = self.request.get("transaction_id")
-
             config = Configuration(user_id=self.user_id, api_secret=self.api_secret)
             transaction_service = TransactionServiceApi(configuration=config)
             transaction = transaction_service.read(
                 space_id=self.space_id, id=transaction_id
+            )
+            logger.info(
+                f"Transaction {transaction_id} status: {transaction.state}"
             )
             return transaction
 
@@ -352,13 +357,13 @@ class TransactionView(BrowserView, WalleeSettings):
         try:
             return self.transaction.user_failure_message
         except:
-            logger.warn("Could not extract user_failure_message")
+            logger.warning("Could not extract user_failure_message")
 
     def status(self):
         try:
             return self.transaction.state
         except:
-            logger.warn("Could not extract user_failure_message")
+            logger.warning("Could not extract user_failure_message")
 
 
 class TransactionSuccessView(TransactionView):
@@ -373,4 +378,14 @@ class TransactionSuccessView(TransactionView):
             if order_tid == transaction_id:
                 order.salaried = "yes"
                 purge_cart(self.request)
-            return order.salaried
+                logger.info(
+                    f"Update salaried status order_uid {order_uid} with transaction_id {transaction_id}"
+                )
+                return order.salaried
+            else:
+                logger.warning(
+                    f"order_uid {order_uid} and transaction_id {transaction_id} do not match"
+                )
+        logger.warning(
+            f"Could not update salaried status on success page: {self.request.form}"
+        )

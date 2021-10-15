@@ -15,6 +15,7 @@ from bda.plone.checkout.browser.form import SVG_FINISH
 from bda.plone.checkout.interfaces import CheckoutError
 from bda.plone.checkout.interfaces import ICheckoutAdapter
 from bda.plone.checkout.interfaces import ICheckoutSettings
+from bda.plone.orders.common import get_order
 from bda.plone.orders.datamanagers.order import OrderData
 from bda.plone.payment import Payment
 from bda.plone.payment import Payments
@@ -109,7 +110,6 @@ class WalleePaymentLightbox(Payment):
 
 
 class WalleePaymentLightboxView(BrowserView, WalleeSettings):
-
     @property
     def shop_admin_mail(self):
         return shop_admin_mail()
@@ -355,18 +355,18 @@ class TransactionView(BrowserView, WalleeSettings):
     def shop_admin_name(self):
         return shop_admin_name()
 
-
     @property
     def transaction(self):
         if "transaction_id" in self.request:
             transaction_id = self.request.get("transaction_id")
+            order_uid = self.request.get("order_uid")
             config = Configuration(user_id=self.user_id, api_secret=self.api_secret)
             transaction_service = TransactionServiceApi(configuration=config)
             transaction = transaction_service.read(
                 space_id=self.space_id, id=transaction_id
             )
             logger.info(
-                f"Transaction {transaction_id} status: {transaction.state}"
+                f"Transaction for order {order_uid} with transaction_id {transaction_id} {transaction.state}: User-Message: {transaction.user_failure_message}"
             )
             return transaction
 
@@ -374,36 +374,39 @@ class TransactionView(BrowserView, WalleeSettings):
     def message(self):
         try:
             return self.transaction.user_failure_message
+            logger.warning("Could not extract user_failure_message!")
         except:
-            logger.warning("Could not extract user_failure_message")
+            logger.warning("Could not extract user_failure_message!")
 
     def status(self):
         try:
             return self.transaction.state
         except:
-            logger.warning("Could not extract user_failure_message")
+            logger.warning("Could not extract user_failure_message!")
 
 
 class TransactionSuccessView(TransactionView):
     """On Success empty cart & mark order as salaried"""
 
     def status_update(self):
-        if "order_uid" in self.request and "transaction_id" in self.request:
-            transaction_id = self.request.get("transaction_id")
-            order_uid = self.request.get("order_uid")
-            order = OrderData(self.context, order_uid)
-            order_tid = order.tid.pop()
-            if order_tid == transaction_id:
-                order.salaried = "yes"
-                purge_cart(self.request)
-                logger.info(
-                    f"Update salaried status order_uid {order_uid} with transaction_id {transaction_id}"
-                )
-                return order.salaried
-            else:
-                logger.warning(
-                    f"order_uid {order_uid} and transaction_id {transaction_id} do not match"
-                )
+        order = None
+        transaction_id = self.request.get("transaction_id")
+        order_uid = self.request.get("order_uid")
+        if not transaction_id or not order_uid:
+            logger.warning(f"Request params transaction_id or order_id missing!")
+        try:
+            order = get_order(self.context, order_uid)
+        except:
+            logger.error(f"Could not retrieve order {order_uid}")
+        if order:
+            order = OrderData(self.context, order=order)
+            order.tid = transaction_id
+            order.salaried = "yes"
+            purge_cart(self.request)
+            logger.info(
+                f"Updated salaried status order_uid {order_uid} with transaction_id {transaction_id}"
+            )
+            return order.salaried
         logger.warning(
             f"Could not update salaried status on success page: {self.request.form}"
         )

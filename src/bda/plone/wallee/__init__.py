@@ -132,7 +132,7 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             "gender": gender.upper(),
             "givenName": order_data.get("personal_data.firstname", ""),
             "familyName": order_data.get("personal_data.lastname", ""),
-            "organisationName": order_data.get("personal_data.company", ""),
+            "organizationName": order_data.get("personal_data.company", ""),
             "emailAddress": order_data.get("personal_data.email", ""),
             "phoneNumber": order_data.get("personal_data.phone", ""),
             "street": order_data.get("billing_address.street", ""),
@@ -145,7 +145,7 @@ class WalleePaymentLightboxView(BrowserView, WalleeSettings):
             shipping_address = {
                 "givenName": order_data.get("delivery_address.firstname", ""),
                 "familyName": order_data.get("delivery_address.lastname", ""),
-                "organisationName": order_data.get("delivery_address.company", ""),
+                "organizationName": order_data.get("delivery_address.company", ""),
                 "street": order_data.get("delivery_address.street", ""),
                 "postCode": order_data.get("delivery_address.zip", ""),
                 "city": order_data.get("delivery_address.city", ""),
